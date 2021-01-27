@@ -8,7 +8,7 @@ class SalaryPaycheck {
    * @param {object} salaryInput Salary input information
    * @param {'Year'|'Month'|'Week'|'Day'|'Hour'} startFrom Salary input information
    * @param {number} year Year to perform calculation
-   * @param {object} ruling Salary input information
+   * @param {object} ruling Choice between scientific research workers, young professionals with Master's degree or others cases
    * @returns {object} Object with all calculated fields for the salary paycheck
    */
   constructor(salaryInput, startFrom, year, ruling) {
@@ -21,7 +21,7 @@ class SalaryPaycheck {
       grossYear = 0;
     }
 
-    this.grossAllowance = (allowance) ? SalaryPaycheck.getHolidayAllowance(grossYear) : 0;
+    this.grossAllowance = SalaryPaycheck.getHolidayAllowance(grossYear, allowance);
     this.grossYear = roundNumber(grossYear, 2);
     this.grossMonth = SalaryPaycheck.getAmountMonth(grossYear);
     this.grossWeek = SalaryPaycheck.getAmountWeek(grossYear);
@@ -29,7 +29,7 @@ class SalaryPaycheck {
     this.grossHour = SalaryPaycheck.getAmountHour(grossYear, hours);
 
     this.taxFreeYear = 0;
-    this.taxableYear = grossYear - this.grossAllowance;
+    this.taxableYear = grossYear;
 
     if (ruling.checked) {
       let rulingIncome = SalaryPaycheck.getRulingIncome(year, ruling.choice);
@@ -76,8 +76,9 @@ class SalaryPaycheck {
     this.netHour = SalaryPaycheck.getAmountHour(this.netYear, hours);
   }
 
-  static getHolidayAllowance(amountYear) {
-    return roundNumber(amountYear * (0.08 / 1.08), 2); // Vakantiegeld (8%)
+  static getHolidayAllowance(amountYear, included) {
+    const rate = included ? 0.08 / 1.08 : 1.08;
+    return roundNumber(amountYear * rate, 2); // Vakantiegeld (8%)
   }
 
   static getTaxFree(taxFreeYear, grossYear) {
